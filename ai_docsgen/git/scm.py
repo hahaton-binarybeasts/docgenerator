@@ -7,6 +7,8 @@ from typing import Optional, List
 from github import Github, Auth
 from pydantic import BaseModel, PrivateAttr
 
+from ai_docsgen.schemas import RepositoryInfo, TreeItem, FileContent
+
 
 class Scm(BaseModel):
     """Класс для работы с GitHub API"""
