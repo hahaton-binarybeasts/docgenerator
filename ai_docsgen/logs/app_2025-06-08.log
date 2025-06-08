@@ -1,0 +1,24 @@
+2025-06-08 10:43:20 [INFO] [__main__:12] - Запуск приложения
+2025-06-08 10:43:20 [INFO] [__main__:16] - Проверка наличия задач
+2025-06-08 10:43:20 [DEBUG] [urllib3.connectionpool:1049] - Starting new HTTPS connection (1): duke.andreis-vibes.ru:443
+2025-06-08 10:43:21 [DEBUG] [urllib3.connectionpool:544] - https://duke.andreis-vibes.ru:443 "GET /jobs HTTP/1.1" 200 572
+2025-06-08 10:43:23 [INFO] [__main__:16] - Проверка наличия задач
+2025-06-08 10:43:23 [DEBUG] [urllib3.connectionpool:1049] - Starting new HTTPS connection (1): duke.andreis-vibes.ru:443
+2025-06-08 10:43:23 [DEBUG] [urllib3.connectionpool:544] - https://duke.andreis-vibes.ru:443 "GET /jobs HTTP/1.1" 200 572
+2025-06-08 10:43:25 [INFO] [__main__:16] - Проверка наличия задач
+2025-06-08 10:43:25 [DEBUG] [urllib3.connectionpool:1049] - Starting new HTTPS connection (1): duke.andreis-vibes.ru:443
+2025-06-08 10:43:25 [DEBUG] [urllib3.connectionpool:544] - https://duke.andreis-vibes.ru:443 "GET /jobs HTTP/1.1" 200 572
+2025-06-08 10:43:27 [INFO] [__main__:16] - Проверка наличия задач
+2025-06-08 10:43:27 [DEBUG] [urllib3.connectionpool:1049] - Starting new HTTPS connection (1): duke.andreis-vibes.ru:443
+2025-06-08 10:43:27 [DEBUG] [urllib3.connectionpool:544] - https://duke.andreis-vibes.ru:443 "GET /jobs HTTP/1.1" 200 572
+2025-06-08 10:43:29 [INFO] [__main__:16] - Проверка наличия задач
+2025-06-08 10:43:29 [DEBUG] [urllib3.connectionpool:1049] - Starting new HTTPS connection (1): duke.andreis-vibes.ru:443
+2025-06-08 10:43:29 [DEBUG] [urllib3.connectionpool:544] - https://duke.andreis-vibes.ru:443 "GET /jobs HTTP/1.1" 200 572
+2025-06-08 10:43:31 [INFO] [__main__:16] - Проверка наличия задач
+2025-06-08 10:43:31 [DEBUG] [urllib3.connectionpool:1049] - Starting new HTTPS connection (1): duke.andreis-vibes.ru:443
+2025-06-08 10:43:31 [DEBUG] [urllib3.connectionpool:544] - https://duke.andreis-vibes.ru:443 "GET /jobs HTTP/1.1" 200 572
+2025-06-08 10:43:33 [INFO] [__main__:16] - Проверка наличия задач
+2025-06-08 10:43:33 [DEBUG] [urllib3.connectionpool:1049] - Starting new HTTPS connection (1): duke.andreis-vibes.ru:443
+2025-06-08 10:43:33 [DEBUG] [urllib3.connectionpool:544] - https://duke.andreis-vibes.ru:443 "GET /jobs HTTP/1.1" 200 572
+2025-06-08 10:43:35 [INFO] [__main__:16] - Проверка наличия задач
+2025-06-08 10:43:35 [DEBUG] [urllib3.connectionpool:1049] - Starting new HTTPS connection (1): duke.andreis-vibes.ru:443

@@ -1,0 +1,21 @@
+2025-06-08 11:24:49 [DEBUG] [urllib3.connectionpool:1049] - Starting new HTTPS connection (1): gpt.orionsoft.ru:443
+2025-06-08 11:24:49 [DEBUG] [urllib3.connectionpool:544] - https://gpt.orionsoft.ru:443 "POST /api/External/PostNewRequest HTTP/1.1" 200 37
+2025-06-08 11:24:49 [INFO] [__main__:162] - Сообщение отправлено
+2025-06-08 11:24:49 [DEBUG] [urllib3.connectionpool:1049] - Starting new HTTPS connection (1): gpt.orionsoft.ru:443
+2025-06-08 11:24:49 [DEBUG] [urllib3.connectionpool:544] - https://gpt.orionsoft.ru:443 "POST /api/External/GetNewResponse HTTP/1.1" 200 60
+2025-06-08 11:24:52 [DEBUG] [urllib3.connectionpool:1049] - Starting new HTTPS connection (1): gpt.orionsoft.ru:443
+2025-06-08 11:24:53 [DEBUG] [urllib3.connectionpool:544] - https://gpt.orionsoft.ru:443 "POST /api/External/GetNewResponse HTTP/1.1" 200 599
+2025-06-08 11:24:53 [DEBUG] [urllib3.connectionpool:1049] - Starting new HTTPS connection (1): gpt.orionsoft.ru:443
+2025-06-08 11:24:53 [DEBUG] [urllib3.connectionpool:544] - https://gpt.orionsoft.ru:443 "POST /api/External/PostNewRequest HTTP/1.1" 200 37
+2025-06-08 11:24:53 [INFO] [__main__:162] - Сообщение отправлено
+2025-06-08 11:24:53 [DEBUG] [urllib3.connectionpool:1049] - Starting new HTTPS connection (1): gpt.orionsoft.ru:443
+2025-06-08 11:24:53 [DEBUG] [urllib3.connectionpool:544] - https://gpt.orionsoft.ru:443 "POST /api/External/GetNewResponse HTTP/1.1" 200 60
+2025-06-08 11:24:56 [DEBUG] [urllib3.connectionpool:1049] - Starting new HTTPS connection (1): gpt.orionsoft.ru:443
+2025-06-08 11:24:57 [DEBUG] [urllib3.connectionpool:544] - https://gpt.orionsoft.ru:443 "POST /api/External/GetNewResponse HTTP/1.1" 200 1007
+2025-06-08 11:24:57 [DEBUG] [urllib3.connectionpool:1049] - Starting new HTTPS connection (1): gpt.orionsoft.ru:443
+2025-06-08 11:24:57 [DEBUG] [urllib3.connectionpool:544] - https://gpt.orionsoft.ru:443 "POST /api/External/PostNewRequest HTTP/1.1" 200 37
+2025-06-08 11:24:57 [INFO] [__main__:162] - Сообщение отправлено
+2025-06-08 11:24:57 [DEBUG] [urllib3.connectionpool:1049] - Starting new HTTPS connection (1): gpt.orionsoft.ru:443
+2025-06-08 11:24:57 [DEBUG] [urllib3.connectionpool:544] - https://gpt.orionsoft.ru:443 "POST /api/External/GetNewResponse HTTP/1.1" 200 60
+2025-06-08 11:25:00 [DEBUG] [urllib3.connectionpool:1049] - Starting new HTTPS connection (1): gpt.orionsoft.ru:443
+2025-06-08 11:25:01 [DEBUG] [urllib3.connectionpool:544] - https://gpt.orionsoft.ru:443 "POST /api/External/GetNewResponse HTTP/1.1" 200 1892
