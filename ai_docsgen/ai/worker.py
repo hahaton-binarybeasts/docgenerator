@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import List, Dict, Set
 
 from ai_docsgen.ai.api import AiAPI
+from ai_docsgen.config import Settings
 from ai_docsgen.git.scm import Scm
 from ai_docsgen.log_setup import get_logger
 from ai_docsgen.schemas import Project, TreeItem
@@ -345,7 +346,7 @@ if __name__ == "__main__":
         name="test",
         repository="https://github.com/MigAru/poseidon",
         directory="",
-        access_token="",
+        access_token=Settings().gh_token,
         branches=['main'],
         doc_language="russian",
         doc_type="full",

@@ -76,6 +76,7 @@ class Settings(BaseSettings):
     project_root: Path = CURRENT_DIR
     remote: Remote = Remote()
     ai: AI = AI()
+    gh_token: str
 
     model_config = SettingsConfigDict(
         env_file=CURRENT_DIR.parent / ".env",
