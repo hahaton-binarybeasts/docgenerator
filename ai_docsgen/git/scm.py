@@ -7,7 +7,10 @@ from typing import Optional, List
 from github import Github, Auth
 from pydantic import BaseModel, PrivateAttr
 
+from ai_docsgen.log_setup import get_logger
 from ai_docsgen.schemas import RepositoryInfo, TreeItem, FileContent
+
+log = get_logger(__name__)
 
 
 class Scm(BaseModel):
@@ -20,7 +23,7 @@ class Scm(BaseModel):
     def __init__(self, auth_token: str, **data):
         """
         Инициализация SCM клиента
-        
+
         Args:
             auth_token: GitHub Personal Access Token
         """
@@ -32,20 +35,19 @@ class Scm(BaseModel):
     def get_repository_info(self, repo_name: str, owner: Optional[str] = None) -> RepositoryInfo:
         """
         Получение информации о репозитории
-        
+
         Args:
-            repo_name: Имя репозитория
-            owner: Владелец репозитория (если не указан, используется текущий пользователь)
-            
+            repo_name: Имя репозитория в формате "owner/repo" или полный URL
+            owner: Владелец репозитория (игнорируется, оставлен для обратной совместимости)
+
         Returns:
             RepositoryInfo: Информация о репозитории
         """
         try:
-            if owner:
-                repo = self._client.get_repo(f"{owner}/{repo_name}")
-            else:
-                user = self._client.get_user()
-                repo = self._client.get_repo(f"{user.login}/{repo_name}")
+            # Нормализация repo_name
+            normalized_repo_name = self._normalize_repo_name(repo_name)
+
+            repo = self._client.get_repo(normalized_repo_name)
 
             return RepositoryInfo(
                 name=repo.name,
@@ -68,26 +70,40 @@ class Scm(BaseModel):
         except Exception as e:
             raise Exception(f"Ошибка получения информации о репозитории: {str(e)}")
 
+    def _normalize_repo_name(self, repo_name: str) -> str:
+        """
+        Нормализует имя репозитория в формат "owner/repo"
+
+        Args:
+            repo_name: Имя репозитория в любом формате (URL, owner/repo)
+
+        Returns:
+            str: Нормализованное имя репозитория в формате "owner/repo"
+        """
+        # Удаляем префикс URL если он есть
+        normalized = repo_name.replace("https://github.com/", "")
+        # Удаляем суффикс .git если он есть
+        normalized = normalized.replace(".git", "")
+        return normalized
+
     def get_repository_structure(self, repo_name: str, owner: Optional[str] = None,
                                  branch: str = "main", path: str = "") -> List[TreeItem]:
         """
         Получение структуры проекта (дерева файлов)
-        
+
         Args:
-            repo_name: Имя репозитория
-            owner: Владелец репозитория
+            repo_name: Имя репозитория в формате "owner/repo" или полный URL
+            owner: Владелец репозитория (игнорируется, оставлен для обратной совместимости)
             branch: Ветка (по умолчанию main)
             path: Путь в репозитории (для получения поддиректории)
-            
+
         Returns:
             List[TreeItem]: Список элементов дерева
         """
+        log.info(f"Получение структуры репозитория {repo_name} (ветка: {branch}, путь: {path})")
         try:
-            if owner:
-                repo = self._client.get_repo(f"{owner}/{repo_name}")
-            else:
-                user = self._client.get_user()
-                repo = self._client.get_repo(f"{user.login}/{repo_name}")
+            normalized_repo_name = self._normalize_repo_name(repo_name)
+            repo = self._client.get_repo(normalized_repo_name)
 
             contents = repo.get_contents(path, ref=branch)
 
@@ -114,22 +130,19 @@ class Scm(BaseModel):
                          owner: Optional[str] = None, branch: str = "main") -> FileContent:
         """
         Получение содержимого файла
-        
+
         Args:
-            repo_name: Имя репозитория
+            repo_name: Имя репозитория в формате "owner/repo" или полный URL
             file_path: Путь к файлу в репозитории
-            owner: Владелец репозитория
+            owner: Владелец репозитория (игнорируется, оставлен для обратной совместимости)
             branch: Ветка
-            
+
         Returns:
             FileContent: Содержимое файла
         """
         try:
-            if owner:
-                repo = self._client.get_repo(f"{owner}/{repo_name}")
-            else:
-                user = self._client.get_user()
-                repo = self._client.get_repo(f"{user.login}/{repo_name}")
+            normalized_repo_name = self._normalize_repo_name(repo_name)
+            repo = self._client.get_repo(normalized_repo_name)
 
             file = repo.get_contents(file_path, ref=branch)
 
@@ -155,13 +168,13 @@ class Scm(BaseModel):
                           private: bool = False, auto_init: bool = True) -> RepositoryInfo:
         """
         Создание удалённого репозитория
-        
+
         Args:
             repo_name: Имя репозитория
             description: Описание репозитория
             private: Приватный ли репозиторий
             auto_init: Автоматически создать README
-            
+
         Returns:
             RepositoryInfo: Информация о созданном репозитории
         """
@@ -201,13 +214,13 @@ class Scm(BaseModel):
                                  branch: str = "main") -> bool:
         """
         Инициализация локального репозитория и пуш в GitHub
-        
+
         Args:
             local_path: Путь к локальной папке
             repo_name: Имя репозитория на GitHub
             commit_message: Сообщение коммита
             branch: Основная ветка
-            
+
         Returns:
             bool: Успешность операции
         """
@@ -220,7 +233,13 @@ class Scm(BaseModel):
 
             # Получаем информацию о пользователе для формирования URL
             user = self._client.get_user()
-            repo_url = f"https://github.com/{user.login}/{repo_name}.git"
+            normalized_repo_name = self._normalize_repo_name(repo_name)
+
+            # Если repo_name уже содержит имя владельца, используем его
+            if "/" in normalized_repo_name:
+                repo_url = f"https://github.com/{normalized_repo_name}.git"
+            else:
+                repo_url = f"https://github.com/{user.login}/{normalized_repo_name}.git"
 
             # Переходим в директорию
             os.chdir(local_path)
