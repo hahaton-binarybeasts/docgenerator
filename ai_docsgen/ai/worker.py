@@ -348,7 +348,7 @@ if __name__ == "__main__":
         access_token="",
         branches=['master'],
         doc_language="russian",
-        doc_type="full_generation",
+        doc_type="full",
         instructions="",
         docs_repository="",
         docs_url="",

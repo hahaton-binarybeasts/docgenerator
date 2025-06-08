@@ -1,8 +1,9 @@
-from datetime import datetime
+from pydantic import BaseModel
 from typing import List, Literal, Optional
+from datetime import datetime
 from uuid import UUID
+from enum import Enum
 
-<<<<<<< HEAD
 class DocType(str, Enum):
     FULL = "full"
     PRIVATE = "private"
@@ -32,9 +33,6 @@ class Job(BaseModel):
     result: Optional[dict] = None
     started_at: datetime
     completed_at: datetime
-=======
-from pydantic import BaseModel
->>>>>>> parent of fd9376a (add job model)
 
 
 class Project(BaseModel):
@@ -45,18 +43,11 @@ class Project(BaseModel):
     access_token: str
     branches: List[str]
     doc_language: str
-<<<<<<< HEAD
     doc_type: DocType
     instructions: Optional[str]
     docs_repository: Optional[str]
     docs_url: Optional[str]
     jobs: Optional[List[Job]] = []
-=======
-    doc_type: Literal["full"]
-    instructions: str
-    docs_repository: str
-    docs_url: str
->>>>>>> parent of fd9376a (add job model)
     created_at: datetime
     updated_at: datetime
 
