@@ -4,6 +4,10 @@ from datetime import datetime
 from uuid import UUID
 from enum import Enum
 
+class DocType(str, Enum):
+    FULL = "full"
+    PRIVATE = "private"
+    PUBLIC = "public"
 
 class JobStatus(str, Enum):
     PENDING = "pending"
@@ -21,14 +25,14 @@ class JobType(str, Enum):
 class Job(BaseModel):
     id: UUID
     project_id: UUID
+    branch: str
+    commit_id: str
     status: JobStatus
-    type: str
-    started_at: Optional[datetime] = None
-    completed_at: Optional[datetime] = None
+    job_type: JobType
     error_message: Optional[str] = None
     result: Optional[dict] = None
-    created_at: datetime
-    updated_at: datetime
+    started_at: datetime
+    completed_at: datetime
 
 
 class Project(BaseModel):
@@ -39,7 +43,7 @@ class Project(BaseModel):
     access_token: str
     branches: List[str]
     doc_language: str
-    doc_type: JobType
+    doc_type: DocType
     instructions: Optional[str]
     docs_repository: Optional[str]
     docs_url: Optional[str]
