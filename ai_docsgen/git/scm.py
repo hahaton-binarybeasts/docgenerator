@@ -18,19 +18,25 @@ class Scm(BaseModel):
 
     # Приватные атрибуты для PyGithub клиента
     _client: Github = PrivateAttr()
-    _auth_token: str = PrivateAttr()
+    _auth_token: Optional[str] = PrivateAttr(default=None)
 
-    def __init__(self, auth_token: str, **data):
+    def __init__(self, auth_token: Optional[str] = None, **data):
         """
         Инициализация SCM клиента
 
         Args:
-            auth_token: GitHub Personal Access Token
+            auth_token: GitHub Personal Access Token. Если не указан, доступ только к публичным репозиториям.
         """
         super().__init__(**data)
         self._auth_token = auth_token
-        auth = Auth.Token(auth_token)
-        self._client = Github(auth=auth)
+        
+        if auth_token:
+            auth = Auth.Token(auth_token)
+            self._client = Github(auth=auth)
+        else:
+            # Инициализация без аутентификации (для публичных репозиториев)
+            self._client = Github()
+            log.info("Инициализация SCM клиента без аутентификации. Доступны только публичные репозитории с ограничением запросов.")
 
     def get_repository_info(self, repo_name: str, owner: Optional[str] = None) -> RepositoryInfo:
         """
@@ -178,6 +184,9 @@ class Scm(BaseModel):
         Returns:
             RepositoryInfo: Информация о созданном репозитории
         """
+        if not self._auth_token:
+            raise Exception("Для создания репозитория требуется аутентификация. Укажите auth_token при инициализации Scm.")
+            
         try:
             user = self._client.get_user()
             repo = user.create_repo(
@@ -224,6 +233,9 @@ class Scm(BaseModel):
         Returns:
             bool: Успешность операции
         """
+        if not self._auth_token:
+            raise Exception("Для операций с локальным репозиторием требуется аутентификация. Укажите auth_token при инициализации Scm.")
+            
         try:
             local_path = Path(local_path).resolve()
 
@@ -301,6 +313,9 @@ class Scm(BaseModel):
         Returns:
             RepositoryInfo: Информация о созданном репозитории
         """
+        if not self._auth_token:
+            raise Exception("Для создания и пуша репозитория требуется аутентификация. Укажите auth_token при инициализации Scm.")
+            
         # Создаем репозиторий на GitHub (без auto_init, чтобы избежать конфликтов)
         repo_info = self.create_repository(
             repo_name=repo_name,

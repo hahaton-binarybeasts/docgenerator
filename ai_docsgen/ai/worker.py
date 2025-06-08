@@ -343,10 +343,10 @@ if __name__ == "__main__":
     project = Project(
         id=uuid.uuid4(),
         name="test",
-        repository="https://github.com/hahaton-binarybeasts/docgenerator.git",
-        directory="/ai_docsgen",
+        repository="https://github.com/MigAru/poseidon",
+        directory="",
         access_token="",
-        branches=['master'],
+        branches=['main'],
         doc_language="russian",
         doc_type="full",
         instructions="",
