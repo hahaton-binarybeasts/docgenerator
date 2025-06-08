@@ -1,3 +1,4 @@
+from uuid import UUID
 import requests
 from typing import Optional, Dict, Any, Union
 from app.schemas import Project
@@ -100,4 +101,14 @@ class RestApiClient:
 
     def get_projects(self) -> list[Project]:
         projects_raw = self._get("projects")
-        Project.pa
+        projects: list[Project] = []
+        for p in projects_raw:
+            projects.append(Project.model_validate(p))
+        
+        return projects
+    
+    def get_project(self, id: UUID) -> Project:
+        project_raw = self._get(f"project/{id}")
+        project = Project.model_validate(project_raw)
+
+        return project
