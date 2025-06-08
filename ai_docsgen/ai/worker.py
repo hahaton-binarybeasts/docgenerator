@@ -239,6 +239,133 @@ class PipelineWorker:
 
         return tree
 
+    def create_overview_documentation(self, doc_directory_path: Path):
+        """
+        Создает обзорную документацию для всего проекта
+        
+        Args:
+            doc_directory_path: Путь к директории с документацией
+        """
+        log.info(f"Создание обзорной документации для директории: {doc_directory_path}")
+        
+        # Путь к промпту для обзорной документации
+        overview_prompt_path = Path(__file__).parent / "prompts" / "overview.txt"
+        
+        try:
+            # Читаем промпт для обзорной документации
+            log.debug(f"Чтение промпта обзорной документации из {overview_prompt_path}")
+            with open(overview_prompt_path, 'r', encoding='utf-8') as f:
+                prompt = f.read()
+            log.debug(f"Промпт успешно прочитан, размер: {len(prompt)} символов")
+            
+            # Рекурсивно собираем все .md файлы
+            md_files = []
+            log.debug("Рекурсивный сбор .md файлов")
+            
+            def collect_md_files(directory: Path, base_path: Path) -> List[Dict[str, str]]:
+                """Рекурсивно собирает все .md файлы"""
+                files_data = []
+                
+                for item in directory.iterdir():
+                    if item.is_file() and item.suffix == '.md':
+                        # Получаем относительный путь от базовой директории документации
+                        relative_path = item.relative_to(base_path)
+                        
+                        log.debug(f"Чтение файла: {relative_path}")
+                        try:
+                            with open(item, 'r', encoding='utf-8') as f:
+                                content = f.read()
+                            
+                            files_data.append({
+                                'path': str(relative_path),
+                                'content': content
+                            })
+                            log.debug(f"Файл {relative_path} успешно прочитан, размер: {len(content)} символов")
+                        except Exception as e:
+                            log.error(f"Ошибка при чтении файла {relative_path}: {e}")
+                    
+                    elif item.is_dir():
+                        # Рекурсивно обходим поддиректории
+                        log.debug(f"Обход поддиректории: {item.name}")
+                        subdirectory_files = collect_md_files(item, base_path)
+                        files_data.extend(subdirectory_files)
+                
+                return files_data
+            
+            md_files = collect_md_files(doc_directory_path, doc_directory_path)
+            log.info(f"Собрано {len(md_files)} файлов документации")
+            
+            # Создаем структуру проекта (дерево директорий)
+            log.debug("Построение структуры проекта")
+            
+            def build_project_structure(directory: Path, base_path: Path, prefix: str = "") -> str:
+                """Строит текстовое представление структуры директорий"""
+                structure = ""
+                items = []
+                
+                # Собираем все элементы директории
+                for item in directory.iterdir():
+                    items.append(item)
+                
+                # Сортируем: сначала директории, потом файлы
+                items.sort(key=lambda x: (x.is_file(), x.name))
+                
+                for i, item in enumerate(items):
+                    is_last = i == len(items) - 1
+                    current_prefix = "└── " if is_last else "├── "
+                    next_prefix = "    " if is_last else "│   "
+                    
+                    relative_path = item.relative_to(base_path)
+                    structure += f"{prefix}{current_prefix}{item.name}\n"
+                    
+                    if item.is_dir():
+                        structure += build_project_structure(
+                            item, 
+                            base_path, 
+                            prefix + next_prefix
+                        )
+                
+                return structure
+            
+            project_structure = build_project_structure(doc_directory_path, doc_directory_path)
+            log.debug(f"Структура проекта построена, размер: {len(project_structure)} символов")
+            
+            # Формируем полный запрос для AI
+            request = f"{prompt}\n\n"
+            request += "## СТРУКТУРА ПРОЕКТА:\n"
+            request += f"```\n{project_structure}```\n\n"
+            request += "## СОДЕРЖИМОЕ ФАЙЛОВ ДОКУМЕНТАЦИИ:\n\n"
+            
+            # Добавляем содержимое каждого файла
+            for file_data in md_files:
+                request += f"### Файл: {file_data['path']}\n"
+                request += f"```markdown\n{file_data['content']}\n```\n\n"
+            
+            log.info(f"Сформирован запрос для AI, размер: {len(request)} символов")
+            
+            # Отправляем запрос в AI
+            log.debug("Отправка запроса в AI для создания обзорной документации")
+            dialog = self.ai_instance.new_dialog()
+            response = dialog.ask_ai(request)
+            log.info(f"Получен ответ от AI, размер: {len(response)} символов")
+            
+            # Сохраняем результат в README.md
+            readme_path = doc_directory_path / "README.md"
+            log.info(f"Сохранение обзорной документации в {readme_path}")
+            
+            with open(readme_path, "w", encoding="utf-8") as f:
+                f.write(response)
+            
+            log.info("Обзорная документация успешно создана")
+            
+        except Exception as e:
+            log.error(f"Ошибка при создании обзорной документации: {e}")
+            # Создаем базовый README в случае ошибки
+            readme_path = doc_directory_path / "README.md"
+            with open(readme_path, "w", encoding="utf-8") as f:
+                f.write(f"# Документация проекта\n\nОшибка при генерации обзорной документации: {str(e)}\n")
+            log.info("Создан базовый README с информацией об ошибке")
+
     def process(self, project: Project) -> str:
         """
         Основной метод обработки проекта и генерации документации
@@ -282,22 +409,7 @@ class PipelineWorker:
             directory_tree = self._build_directory_tree(modules)
             log.info(f"Построено дерево директорий с {len(directory_tree)} узлами")
 
-            # Создаем README.md в корне с общей информацией
-            readme_path = temp_dir / "README.md"
-            log.info(f"Создание основного README в {readme_path}")
-            with open(readme_path, "w", encoding="utf-8") as f:
-                f.write(f"# Документация проекта {project.name}\n\n")
-                f.write("## Структура проекта\n\n")
 
-                # Создаем структуру проекта в README
-                for module_path in sorted(directory_tree.keys()):
-                    display_path = module_path if module_path else "/"
-                    path_depth = len(display_path.split('/')) - 1 if module_path else 0
-                    indent = "  " * path_depth
-                    doc_path = module_path.replace('/', '/') if module_path else "."
-                    f.write(f"{indent}- [{display_path}]({doc_path}/description.md)\n")
-
-            log.debug(f"README успешно создан с информацией о {len(directory_tree)} директориях")
 
             # Генерируем документацию для каждой директории
             for module_path, file_paths in modules.items():
@@ -318,7 +430,7 @@ class PipelineWorker:
                         # Создаем структуру директорий
                         module_dir = temp_dir / module_path
                         module_dir.mkdir(parents=True, exist_ok=True)
-                        doc_file_path = module_dir / "description.md"
+                        doc_file_path = module_dir / f"{module_dir.name}.md"
                     else:
                         doc_file_path = temp_dir / "description.md"
 
@@ -329,6 +441,11 @@ class PipelineWorker:
 
                 except Exception as e:
                     log.error(f"Ошибка при обработке директории {module_path}: {e}")
+
+            # Создаем README.md в корне с общей информацией
+            log.info(f"Создание основного README")
+            self.create_overview_documentation(temp_dir)
+            log.debug(f"README успешно создан")
 
             log.info(f"Обработка проекта {project.name} завершена успешно")
             return str(temp_dir)
@@ -343,7 +460,7 @@ if __name__ == "__main__":
 
     project = Project(
         id=uuid.uuid4(),
-        name="test",
+        name="poseidon",
         repository="https://github.com/MigAru/poseidon",
         directory="",
         access_token=Settings().gh_token,
